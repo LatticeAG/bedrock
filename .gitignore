@@ -1,0 +1,31 @@
+# Spec/source-of-truth documents — never committed
+SPEC*.md
+*EXTREME*.md
+PROMPT*.md
+REVIEW*.md
+FIX_PROMPT*
+SELFREVIEW*
+DRAFT*
+REPORT.md
+INTERFACES.md
+STATUS*
+BUILD_PROMPT.md
+
+# Build outputs
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# Local emulator state
+*.local.db
+*.local.db-journal
+*.local.db-wal
+*.local.db-shm
+.bedrock-local*

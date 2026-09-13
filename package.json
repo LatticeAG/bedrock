@@ -1,0 +1,39 @@
+{
+  "name": "@latticeagi/bedrock",
+  "version": "0.1.0",
+  "description": "Versioned signed charters, exact version pins, gateway allow/deny, advisory disputes, audit, and fleet split detection.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "bedrock": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/tenant.d.ts",
+      "import": "./dist/server/tenant.js"
+    }
+  },
+  "files": [
+    "dist",
+    "conformance"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"dist/tests/*.test.js\"",
+    "test:vectors": "npm run build && node --test dist/tests/conformance.test.js",
+    "bedrock": "npm run build && node dist/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  }
+}
