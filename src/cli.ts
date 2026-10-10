@@ -3,9 +3,10 @@
  * bedrock CLI (spec §8.1) — 23 commands, canonical JSON + LF on stdout,
  * diagnostics on stderr, exit codes per the §8.1 table.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, realpathSync } from "node:fs";
 import { resolve, dirname } from "node:path";
-import { BedrockError, exitCodeFor, type ErrorCode } from "./errors.js";
+import { pathToFileURL } from "node:url";
+import { BedrockError, apiError, exitCodeFor, type ErrorCode } from "./errors.js";
 import { canonicalString, parseJsonBytes, type Json } from "./canon.js";
 import { parseYaml } from "./yaml.js";
 import { D, S, sha256Hex, hexDecode, ed25519Sign, b64urlEncode, ed25519PublicKey } from "./crypto.js";
@@ -614,11 +615,11 @@ export async function main(argv: string[]): Promise<number> {
     return await cmd(sub);
   } catch (e) {
     if (e instanceof ApiError) {
-      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq } } as unknown as Json);
+      out(apiError(e.code, e.auditSeq, e.detail) as unknown as Json);
       return exitCodeFor(e.code);
     }
     if (e instanceof BedrockError) {
-      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq } } as unknown as Json);
+      out(apiError(e.code, e.auditSeq, e.message) as unknown as Json);
       return exitCodeFor(e.code);
     }
     if (e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError")) {
@@ -629,7 +630,10 @@ export async function main(argv: string[]): Promise<number> {
   }
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+// Resolve symlinks so the npm .bin shim (node_modules/.bin/bedrock -> dist/cli.js)
+// still enters main(); argv[1] keeps the symlink path while import.meta.url is real.
+const invokedAs = process.argv[1];
+if (invokedAs && import.meta.url === pathToFileURL(realpathSync(invokedAs)).href) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (e) => {

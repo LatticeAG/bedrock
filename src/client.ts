@@ -11,14 +11,18 @@ import type {
 } from "./types.js";
 
 export class ApiError extends Error {
+  /** Human-readable detail sent by the server, when present. */
+  readonly detail: string | undefined;
   constructor(
     readonly status: number,
     readonly code: ErrorCode,
     readonly retryable: boolean,
     readonly auditSeq: number | null,
+    detail?: string,
   ) {
-    super(`${code} (HTTP ${status})`);
+    super(detail ? `${code} (HTTP ${status}): ${detail}` : `${code} (HTTP ${status})`);
     this.name = "ApiError";
+    this.detail = detail;
   }
 }
 
@@ -50,12 +54,13 @@ async function doFetch(
     let parsed: Json = null;
     if (bytes.length) parsed = parseJsonBytes(bytes);
     if (res.status >= 400) {
-      const err = (parsed as { error?: { code?: ErrorCode; retryable?: boolean; audit_seq?: number | null } })?.error;
+      const err = (parsed as { error?: { code?: ErrorCode; retryable?: boolean; audit_seq?: number | null; message?: string } })?.error;
       throw new ApiError(
         res.status,
         err?.code ?? "AUDIT_UNAVAILABLE",
         err?.retryable ?? false,
         err?.audit_seq ?? null,
+        err?.message,
       );
     }
     return { status: res.status, body: parsed };

@@ -33,14 +33,15 @@ class BedrockError(Exception):
         return self.code in RETRYABLE
 
 
-def api_error(code: str, audit_seq: int | None = None) -> dict:
-    return {
-        "error": {
-            "code": code,
-            "retryable": code in RETRYABLE,
-            "audit_seq": audit_seq,
-        }
+def api_error(code: str, audit_seq: int | None = None, message: str | None = None) -> dict:
+    err = {
+        "code": code,
+        "retryable": code in RETRYABLE,
+        "audit_seq": audit_seq,
     }
+    if message is not None:
+        err["message"] = message
+    return {"error": err}
 
 
 def http_status_for(code: str) -> int:

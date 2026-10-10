@@ -27,10 +27,12 @@
     "conformance"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test \"dist/tests/*.test.js\"",
-    "test:vectors": "npm run build && node --test dist/tests/conformance.test.js",
-    "bedrock": "npm run build && node dist/cli.js"
+    "clean": "node -e \"const{rmSync}=require('node:fs');for(const d of['dist','dist-test'])rmSync(d,{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test \"dist-test/tests/*.test.js\"",
+    "test:vectors": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/tests/conformance.test.js",
+    "bedrock": "npm run build && node dist/cli.js",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

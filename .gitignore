@@ -14,6 +14,7 @@ BUILD_PROMPT.md
 # Build outputs
 node_modules/
 dist/
+dist-test/
 *.tsbuildinfo
 
 # Python
@@ -21,6 +22,7 @@ dist/
 __pycache__/
 *.pyc
 *.egg-info/
+build/
 .pytest_cache/
 
 # Local emulator state
