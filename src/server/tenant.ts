@@ -239,7 +239,7 @@ export class BedrockTenantDO {
     } catch (e) {
       if (e instanceof CrashFault) throw e;
       if (e instanceof BedrockError) {
-        return { status: e.statusOverride ?? httpStatusFor(e.code), body: apiError(e.code, e.auditSeq) };
+        return { status: e.statusOverride ?? httpStatusFor(e.code), body: apiError(e.code, e.auditSeq, e.message) };
       }
       throw e;
     }

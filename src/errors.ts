@@ -29,10 +29,17 @@ export class BedrockError extends Error {
   }
 }
 
-export function apiError(code: ErrorCode, auditSeq: number | null = null): {
-  error: { code: ErrorCode; retryable: boolean; audit_seq: number | null };
+export function apiError(code: ErrorCode, auditSeq: number | null = null, message?: string): {
+  error: { code: ErrorCode; retryable: boolean; audit_seq: number | null; message?: string };
 } {
-  return { error: { code, retryable: RETRYABLE.has(code), audit_seq: auditSeq } };
+  return {
+    error: {
+      code,
+      retryable: RETRYABLE.has(code),
+      audit_seq: auditSeq,
+      ...(message !== undefined ? { message } : {}),
+    },
+  };
 }
 
 /** HTTP status mapping per spec §7.1. */

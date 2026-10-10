@@ -53,7 +53,7 @@ export async function workerFetch(
       return {
         status: httpStatusFor(e.code),
         headers: { "content-type": "application/json", "cache-control": "no-store" },
-        body: canonicalString(apiError(e.code, e.auditSeq)),
+        body: canonicalString(apiError(e.code, e.auditSeq, e.message)),
       };
     }
     return {

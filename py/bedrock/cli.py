@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-from .errors import BedrockError, exit_code_for, NotImplementedSurface
+from .errors import BedrockError, api_error, exit_code_for, NotImplementedSurface
 from .canon import canonical_string, parse_json_bytes
 from .yaml_strict import parse_yaml
 from .crypto import D, S, hex_decode, ed25519_sign, b64url_encode
@@ -548,10 +548,10 @@ def main(argv) -> int:
     try:
         return cmd(sub)
     except ApiError as e:
-        _out({"error": {"code": e.code, "retryable": e.retryable, "audit_seq": e.audit_seq}})
+        _out(api_error(e.code, e.audit_seq, e.detail))
         return exit_code_for(e.code)
     except BedrockError as e:
-        _out({"error": {"code": e.code, "retryable": e.retryable, "audit_seq": e.audit_seq}})
+        _out(api_error(e.code, e.audit_seq, str(e)))
         return exit_code_for(e.code)
     except NotImplementedSurface as e:
         _err(str(e))

@@ -9,12 +9,16 @@ from .canon import canonical_string, parse_json_bytes
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, code: str, retryable: bool, audit_seq):
-        super().__init__(f"{code} (HTTP {status})")
+    def __init__(self, status: int, code: str, retryable: bool, audit_seq, detail=None):
+        msg = f"{code} (HTTP {status})"
+        if detail:
+            msg += f": {detail}"
+        super().__init__(msg)
         self.status = status
         self.code = code
         self.retryable = retryable
         self.audit_seq = audit_seq
+        self.detail = detail
 
 
 class BedrockClient:
@@ -47,6 +51,7 @@ class BedrockClient:
             raise ApiError(
                 status, err.get("code", "AUDIT_UNAVAILABLE"),
                 err.get("retryable", False), err.get("audit_seq"),
+                err.get("message"),
             )
         return status, parsed
 

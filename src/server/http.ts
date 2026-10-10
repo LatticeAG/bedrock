@@ -73,7 +73,7 @@ export class LocalEmulator {
           "content-type": "application/json",
           "cache-control": "no-store",
         });
-        res.end(canonicalString(apiError(e.code, e.auditSeq)));
+        res.end(canonicalString(apiError(e.code, e.auditSeq, e.message)));
         return;
       }
       res.writeHead(500, { "content-type": "application/json" });
