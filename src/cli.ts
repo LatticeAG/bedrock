@@ -19,7 +19,7 @@ import { verifyBundle, checkSignatures, canonicalEqual } from "./bundle.js";
 import { verifyEvidence } from "./evidence.js";
 import { semanticDiff } from "./diff.js";
 import { BedrockClient, ApiError } from "./client.js";
-import { loadConfig, loadAuthRecords, loadResponseKeys, loadAuditSeed, clientCredential, resolveEnvRef } from "./config.js";
+import { loadConfig, loadAuthRecords, loadResponseKeys, loadAuditSeed, clientCredential, resolveEnvRef, ResponseKeyError } from "./config.js";
 import { Store } from "./server/storage.js";
 import { BedrockTenantDO } from "./server/tenant.js";
 import { LocalEmulator } from "./server/http.js";
@@ -619,7 +619,7 @@ export async function main(argv: string[]): Promise<number> {
       return exitCodeFor(e.code);
     }
     if (e instanceof BedrockError) {
-      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq } } as unknown as Json);
+      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq, ...(e instanceof ResponseKeyError ? { message: e.message } : {}) } } as unknown as Json);
       return exitCodeFor(e.code);
     }
     if (e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError")) {

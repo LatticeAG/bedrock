@@ -15,6 +15,8 @@ import { PUB, FIXTURE_ADAPTER_BUILD_HASH } from "./fixtures.js";
 
 const ENV_REF = /^env:[A-Z][A-Z0-9_]{0,63}$/;
 
+export class ResponseKeyError extends BedrockError {}
+
 export function isEnvRef(s: string): boolean {
   return ENV_REF.test(s);
 }
@@ -165,10 +167,10 @@ export function loadResponseKeys(cfg: Config): ResponseKeys {
     try {
       const b = Buffer.from(kk.key_base64url, "base64url");
       if (b.length !== 32 || Buffer.from(b).toString("base64url") !== kk.key_base64url) {
-        throw new BedrockError("SCHEMA", "response key must be canonical base64url of 32 bytes");
+        throw new ResponseKeyError("SCHEMA", `environment variable ${cfg.response_keys_ref.slice(4)}: response key must be canonical unpadded base64url encoding of 32 bytes`);
       }
     } catch {
-      throw new BedrockError("SCHEMA", "response key must be canonical base64url of 32 bytes");
+      throw new ResponseKeyError("SCHEMA", `environment variable ${cfg.response_keys_ref.slice(4)}: response key must be canonical unpadded base64url encoding of 32 bytes`);
     }
   }
   if (o.keys.length < 1 || o.keys.length > 8 || !ids.has(o.active_key_id)) {
