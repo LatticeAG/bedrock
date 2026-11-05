@@ -8,18 +8,18 @@
     "node": ">=22.5.0"
   },
   "bin": {
-    "bedrock": "dist/cli.js"
+    "bedrock": "dist/src/cli.js"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     },
     "./server": {
-      "types": "./dist/server/tenant.d.ts",
-      "import": "./dist/server/tenant.js"
+      "types": "./dist/src/server/tenant.d.ts",
+      "import": "./dist/src/server/tenant.js"
     }
   },
   "files": [
@@ -30,7 +30,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test \"dist/tests/*.test.js\"",
     "test:vectors": "npm run build && node --test dist/tests/conformance.test.js",
-    "bedrock": "npm run build && node dist/cli.js"
+    "bedrock": "npm run build && node dist/src/cli.js",
+    "smoke": "bash scripts/smoke.sh"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

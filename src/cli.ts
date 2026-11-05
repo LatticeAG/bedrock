@@ -3,7 +3,8 @@
  * bedrock CLI (spec §8.1) — 23 commands, canonical JSON + LF on stdout,
  * diagnostics on stderr, exit codes per the §8.1 table.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { resolve, dirname } from "node:path";
 import { BedrockError, exitCodeFor, type ErrorCode } from "./errors.js";
 import { canonicalString, parseJsonBytes, type Json } from "./canon.js";
@@ -18,7 +19,7 @@ import { verifyBundle, checkSignatures, canonicalEqual } from "./bundle.js";
 import { verifyEvidence } from "./evidence.js";
 import { semanticDiff } from "./diff.js";
 import { BedrockClient, ApiError } from "./client.js";
-import { loadConfig, loadAuthRecords, loadResponseKeys, loadAuditSeed, clientCredential, resolveEnvRef } from "./config.js";
+import { loadConfig, loadAuthRecords, loadResponseKeys, loadAuditSeed, clientCredential, resolveEnvRef, ResponseKeyError } from "./config.js";
 import { Store } from "./server/storage.js";
 import { BedrockTenantDO } from "./server/tenant.js";
 import { LocalEmulator } from "./server/http.js";
@@ -618,7 +619,7 @@ export async function main(argv: string[]): Promise<number> {
       return exitCodeFor(e.code);
     }
     if (e instanceof BedrockError) {
-      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq } } as unknown as Json);
+      out({ error: { code: e.code, retryable: e.retryable, audit_seq: e.auditSeq, ...(e instanceof ResponseKeyError ? { message: e.message } : {}) } } as unknown as Json);
       return exitCodeFor(e.code);
     }
     if (e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError")) {
@@ -629,7 +630,7 @@ export async function main(argv: string[]): Promise<number> {
   }
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (e) => {
