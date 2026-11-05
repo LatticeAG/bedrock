@@ -3,7 +3,8 @@
  * bedrock CLI (spec §8.1) — 23 commands, canonical JSON + LF on stdout,
  * diagnostics on stderr, exit codes per the §8.1 table.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { resolve, dirname } from "node:path";
 import { BedrockError, exitCodeFor, type ErrorCode } from "./errors.js";
 import { canonicalString, parseJsonBytes, type Json } from "./canon.js";
@@ -629,7 +630,7 @@ export async function main(argv: string[]): Promise<number> {
   }
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (e) => {
