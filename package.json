@@ -10,16 +10,16 @@
   "bin": {
     "bedrock": "dist/src/cli.js"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     },
     "./server": {
-      "types": "./dist/server/tenant.d.ts",
-      "import": "./dist/server/tenant.js"
+      "types": "./dist/src/server/tenant.d.ts",
+      "import": "./dist/src/server/tenant.js"
     }
   },
   "files": [
